@@ -1,0 +1,46 @@
+name: Dependabot Auto-Merge
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  auto-merge:
+    runs-on: ubuntu-latest
+    if: github.actor == 'dependabot[bot]'
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Auto-merge Dependabot PRs for patch-level updates
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const prTitle = pr.title.toLowerCase();
+            
+            // Check if this is a patch update (typically contains "patch" or "patch-level" or version like x.y.Z where Z changes)
+            const isPatchUpdate = prTitle.includes('patch') || 
+                                  /bump .+ from \d+\.\d+\.\d+ to \d+\.\d+\.\d+/.test(prTitle);
+            
+            if (isPatchUpdate) {
+              // Approve the PR
+              await github.rest.pulls.createReview({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: pr.number,
+                event: 'APPROVE'
+              });
+              
+              // Auto-merge the PR
+              await github.rest.pulls.merge({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: pr.number,
+                merge_method: 'squash'
+              });
+              
+              console.log(`Auto-merged Dependabot patch-level PR #${pr.number}`);
+            } else {
+              console.log(`Skipping auto-merge for PR #${pr.number} as it's not a patch-level update`);
+            }
