@@ -1,0 +1,16 @@
+{
+  "name": "ci-extensive-challenge-2",
+  "version": "1.0.0",
+  "description": "A repository to test complex GitHub automation workflows",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.17.1",
+    "lodash": "^4.17.20"
+  }
+}
